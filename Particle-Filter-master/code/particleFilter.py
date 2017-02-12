@@ -37,7 +37,8 @@ class particleFilter(object):
 			uPrev = self.OData[i]
 			uCurrent = self.OData[i+1]
 			#print uCurrent
-			zCurrent = self.LData[i+1, 6:-1]
+			#zCurrent = self.LData[i+1, 6:-1]
+			zCurrent = self.LData[i + 1][6:-1]
 			self.visualize(XCurrent, self.resolution)
 			XCurrent = self.particleFilterAlgo(XPrev, uCurrent, uPrev, zCurrent)
 
@@ -66,24 +67,31 @@ class particleFilter(object):
 		return XCurrent
 
 	def visualize(self, X, res):
-		self.scat.remove()
+		#self.scat.remove()
 		y = np.floor(X[:,0]/res)
 		x = np.floor(X[:,1]/res)
 		u = np.cos(X[:,2])
 		v = np.sin(X[:,2])
 		self.scat = plt.quiver(x,y,u,v)
 		plt.pause(0.000001)
-		#plt.show()
+		plt.show()
 
 def main():
 	odomData, laserData = logParser.parser()
 	#minDist = np.loadtxt('min_d.dat', delimiter=' ')
 	m, mapData, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
-	numParticles = 100
+	numParticles = 10
 	particleSize = 3
 	downSample = 90
 	offset = 25
 	XInitial = np.zeros([numParticles,particleSize])
+	for i in range(numParticles):
+		while (1):
+			#XInitial[i] = np.array([3900, 4000, 0])
+			XInitial[i] = np.array([np.random.uniform(0, global_mapsize_x), np.random.uniform(0, global_mapsize_y), np.random.uniform(-1*np.pi, np.pi)])
+			occ = gridFunctions.occupancy(XInitial[i], resolution, mapData)
+			if occ>0.8:# and occ>-1:
+				break
 	for i in range(numParticles):
 		while (1):
 			#XInitial[i] = np.array([3900, 4000, 0])

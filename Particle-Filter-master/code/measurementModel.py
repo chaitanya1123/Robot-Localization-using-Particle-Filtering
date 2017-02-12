@@ -28,13 +28,15 @@ def measurementToMap(zt, xt, n, L):
     #IPython.embed()
     zt_map = np.empty([n])
     #print zt_map.shape
-    for k in range(0, zt.shape[0], zt.shape[0]/n):
+    #for k in range(0, zt.shape[0], zt.shape[0]/n):
+    for k in range(0, len(zt), len(zt) / n):
         theta = xt[2]
         phi = -90 + k      #ztk[2]
         xt_k = xt[0] + L*math.cos(theta) + zt[k]*math.cos(theta + phi)
         yt_k = xt[1] + L*math.sin(theta) + zt[k]*math.sin(theta + phi)
         #IPython.embed()
-        zt_map[k*n/zt.shape[0]] = math.sqrt(xt_k**2 + yt_k**2)
+        #zt_map[k*n/zt.shape[0]] = math.sqrt(xt_k**2 + yt_k**2)
+        zt_map[k * n / len(zt)] = math.sqrt(xt_k ** 2 + yt_k ** 2)
     #print zt_map
     #IPython.embed()
     return zt_map
