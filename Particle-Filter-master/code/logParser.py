@@ -1,29 +1,32 @@
 #!/usr/bin/env python
 import os.path
 import numpy as np
-import matplotlib.pyplot as plt
-
 def parser():
-	OData = []
-	LData = []
+	OData = {}
+	LData = {}
 	basePath = os.path.dirname(__file__)
 	filePath = os.path.abspath(os.path.join(basePath,"..","data","log","robotdata1.log"))
 	f = open(filePath,"r")
 	#with open('robotdata1.log') as f:
 	lines = f.read().splitlines()
 	f.close()
-
+	keyL = 0
+	keyO = 0
 	for i,line in enumerate(lines):
 		if lines[i][0] == 'L':
 			l = lines[i].split()
-			LData.append(float(l[x]) for x in range(1,len(l)))
+			LData[i] = tuple(float(l[x]) for x in range(1,len(l)))
+			LData[keyL]=LData[i]
+			keyL += 1
 
-		if lines[i][0] == 'O':
+
+		elif lines[i][0] == 'O':
 			l = lines[i].split()
-			OData.append(float(l[x]) for x in range(1,len(l)))
-
-	LData = np.array(LData)
-	OData = np.array(OData)
+			OData[i] = tuple(float(l[x]) for x in range(1,len(l)))
+			OData[keyO] = OData[i]
+			keyO += 1
+	#LData = np.array([LData])
+	#OData = np.array([OData])
 
 
 	return OData, LData

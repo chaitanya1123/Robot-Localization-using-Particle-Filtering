@@ -29,11 +29,11 @@ def resampleParticles(X, weights):
 	i = 0
 	for m in range(N): 
 		u = r + (m)*(1.0/N)
-		while u > c:
-			i = i + 1
-			c = c + (1.0*normWeights[i])
-		XNew[k] = X[i]
-		k=k+1
+ 		while u > c:
+ 			i = i + 1
+ 			c = c + (1.0*normWeights[i])
+ 		XNew[k] = X[i]
+ 		k=k+1
 	return XNew
 
 #<<<<<<< HEAD
