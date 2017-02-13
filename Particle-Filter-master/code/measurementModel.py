@@ -29,16 +29,13 @@ def measurementToMap(zt, xt, n, L):
     zt_map = np.empty([n])
     #print zt_map.shape
     #for k in range(0, zt.shape[0], zt.shape[0]/n):
-    for k in range(0, len(zt), len(zt) / n):
+    for k in range(0, len(zt), len(zt)//n):
         theta = xt[2]
         phi = -90 + k      #ztk[2]
         xt_k = xt[0] + L*math.cos(theta) + zt[k]*math.cos(theta + phi)
         yt_k = xt[1] + L*math.sin(theta) + zt[k]*math.sin(theta + phi)
         #IPython.embed()
         #zt_map[k*n/zt.shape[0]] = math.sqrt(xt_k**2 + yt_k**2)
-        zt_map[k * n / len(zt)] = math.sqrt(xt_k ** 2 + yt_k ** 2)
-    #print zt_map
-    #IPython.embed()
     return zt_map
 
 def get_pHit(ztk, zt_true):
@@ -91,11 +88,11 @@ def beamRangeFinderModel(zt, xt, m, n, resolution, L):
         #print get_pShort(zt_map[k], zt_true[k])
         #print get_pMax(zt_map[k])
         #print get_pRand(zt_map[k])
-        p = zHit * get_pHit(zt_map[k], zt_true[k])# + get_pShort(zt_map[k], zt_true[k]) + get_pMax(zt_map[k]) + get_pRand(zt_map[k])
+        p = zHit * get_pHit(zt_map[k], zt_true[k]) + get_pShort(zt_map[k], zt_true[k]) + get_pMax(zt_map[k]) + get_pRand(zt_map[k])
         #print "p: ", p
-        q = p + q
-        p = zShort * get_pShort(zt_map[k], zt_true[k])
-        q = p + q
+        q = p * q
+        #p = zShort * get_pShort(zt_map[k], zt_true[k])
+        #q = p + q
     #print "here"
     return q
 
@@ -104,16 +101,17 @@ def rayCasting(xt, m, laserMax, n, resolution):
     #pixeltocm = 10
     xc = xt[0]
     yc = xt[1]
+    lrange = np.zeros(n)
+    angs = np.zeros(n)
     if gridFunctions.occupancy(xt, resolution, m) == 0:
         lrange = np.zeros(n)
         #print lrange
-        return lrange
+        return lrange,angs
 
     #plt.imshow(m, cmap = 'gray', extent = [0,800,800,0])
     #plt.plot(1.0*xc/10,1.0*yc/10,'bo')
 
-    lrange = np.zeros(n)
-    angs = np.zeros(n)
+
     thetastep = np.pi/n
     for i in range(n):
         theta = -(np.pi/2) + thetastep * i

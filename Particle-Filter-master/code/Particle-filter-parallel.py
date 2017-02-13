@@ -8,7 +8,8 @@ import measurementModel
 import resample
 import IPython
 import matplotlib.pyplot as plt
-
+from multiprocessing import Pool
+import particleFitler
 
 class particleFilter(object):
     """docstring for particleFilter"""
@@ -74,7 +75,7 @@ class particleFilter(object):
         u = np.cos(X[:,2])
         v = np.sin(X[:,2])
         self.scat = plt.quiver(x,y,u,v, edgecolor = 'k', facecolor = 'r')
-        plt.pause(0.00001)
+        plt.pause(0.001)
         #plt.show()
 
 def main():
@@ -83,24 +84,31 @@ def main():
     m, mapData, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
     numParticles = 1000
     particleSize = 3
-    downSample = 10
+    downSample = 90
     offset = 25
     XInitial = np.zeros([numParticles,particleSize])
 
-#    for i in range(numParticles):
-#           XInitial[i] = np.array([np.random.uniform(0, global_mapsize_x), np.random.uniform(0, global_mapsize_y), np.random.uniform(-1*np.pi, np.pi)])
-
     for i in range(numParticles):
         while 1:
-            #XInitial[i] = np.array([3900, 4000, 0])
+            # XInitial[i] = np.array([3900, 4000, 0])
             XInitial[i] = np.array([np.random.uniform(0, global_mapsize_x), np.random.uniform(0, global_mapsize_y),
-                                   np.random.uniform(-1 * np.pi, np.pi)])
+                                    np.random.uniform(-1 * np.pi, np.pi)])
             occ = gridFunctions.occupancy(XInitial[i], resolution, mapData)
             if occ > 0.8:
                 break
-    alpha = np.array([0.00001, 0.00001, 0.01, 0.01])
-    #pf = particleFilter(m, laserData, odomData, mapData, resolution, numParticles, XInitial, alpha, downSample, offset, minDist)
-    pf = particleFilter(m, laserData, odomData, mapData, resolution, numParticles, XInitial, alpha, downSample, offset)
 
-if __name__ == "__main__": 
+    pf = []
+#    for i in range(numParticles):
+#           XInitial[i] = np.array([np.random.uniform(0, global_mapsize_x), np.random.uniform(0, global_mapsize_y), np.random.uniform(-1*np.pi, np.pi)])
+    for j in range(numParticles//numWorkers):
+        for i in range(numWorkers):
+            alpha = np.array([0.00001,0.00001,0.01,0.01])
+            args = [m, laserData, odomData, mapData, resolution, numWorkers, XInitial, alpha, downSample, offset]
+            #pf = particleFilter(m, laserData, odomData, mapData, resolution, numParticles, XInitial, alpha, downSample, offset, minDist)
+            pf[j] = pool.apply_async(particleFilter, args)
+            #pf = [pool.apply_async(particleFilter, args) for i in range(numWorkers)]
+
+if __name__ == "__main__":
+    numWorkers = 10
+    pool = Pool(processes=numWorkers)
     main()
