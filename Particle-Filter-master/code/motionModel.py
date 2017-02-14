@@ -40,10 +40,10 @@ def sample(mu, sigma):
 
 
 def motionModelMap(uCurrent, uPrev, xPrev, alpha, m, resolution):
-    #while (1):
+    while (1):
         xCurrent = motionModel(uCurrent, uPrev, xPrev, alpha)
-        #if (gridFunctions.checkLimits(xCurrent, resolution, m.shape)):
-            #pi = gridFunctions.occupancy(xCurrent, resolution, m)
-            #if pi > 0.8:
-                #break
+        if (gridFunctions.checkLimits(xCurrent, resolution, m.shape)):
+            pi = gridFunctions.occupancy(xCurrent, resolution, m)
+            if pi > 0.8:
+                break
         return xCurrent

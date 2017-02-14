@@ -44,14 +44,13 @@ def parser():
     #plt.imshow(z, cmap = plt.cm.binary)
     #plt.show()
     return m, z, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y
-#=======
+
     m = np.array(m)
     m = np.rot90(m)
     #m= np.transpose(m)
     plt.imshow(m)
     plt.show()
     return m
-#>>>>>>> master:code/mapParser.py
 
 #def main():
 #	m = parser()

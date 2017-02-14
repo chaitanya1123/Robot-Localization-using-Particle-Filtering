@@ -16,12 +16,12 @@ import logParser
 #zMax = 5000
 #L = 25
 
-zRand = 0.033
-zHit = 0.9
-zShort = 0.033
-zMax = 0.034
-sigmaHit = 5
-lambdaShort = 0.5
+zRand = 0.19
+zHit = 0.67
+zShort = 0.13
+zMax = 0.01
+sigmaHit = 2
+lambdaShort = 0.03
 laserMax = 1000
 
 def measurementToMap(zt, xt, n, L):
@@ -90,17 +90,15 @@ def beamRangeFinderModel(zt, xt, m, n, resolution, L):
         #print get_pRand(zt_map[k])
         p = zHit * get_pHit(zt_map[k], zt_true[k]) + get_pShort(zt_map[k], zt_true[k]) + get_pMax(zt_map[k]) + get_pRand(zt_map[k])
         #print "p: ", p
-        q = p * q
-        #p = zShort * get_pShort(zt_map[k], zt_true[k])
-        #q = p + q
-    #print "here"
+        q = q * p
+
     return q
 
 
 def rayCasting(xt, m, laserMax, n, resolution):
     #pixeltocm = 10
-    xc = xt[0]
-    yc = xt[1]
+    xc = xt[0] #x-starting position of the beam
+    yc = xt[1] #y-starting position of the beam
     lrange = np.zeros(n)
     angs = np.zeros(n)
     if gridFunctions.occupancy(xt, resolution, m) == 0:

@@ -8,6 +8,8 @@ import measurementModel
 import resample
 import IPython
 import matplotlib.pyplot as plt
+import os.path
+
 
 
 class particleFilter(object):
@@ -25,13 +27,14 @@ class particleFilter(object):
         self.offset = offset
         #self.minDist = minDist
         XCurrent = self.XInitial
+        #XCurrentBar = self.XInitial
         self.m = m
         plt.imshow(self.m, cmap = 'gray')
         plt.ion()
         self.scat = plt.quiver(0,0,1,0)
         #back = self.LData.shape[0]-1
         back = len(self.LData)-1
-        for i in range(42,200):
+        for i in range(back):
             #print "time " + str(i)
             XPrev = XCurrent
             #IPython.embed()
@@ -40,7 +43,8 @@ class particleFilter(object):
             #print uCurrent
             #zCurrent = self.LData[i+1, 6:-1]
             zCurrent = self.LData[i + 1][6:-1]
-            self.visualize(XCurrent, self.resolution)
+            basePath = os.path.dirname(__file__)
+            self.visualize(XCurrent, self.resolution, i, basePath)
             XCurrent = self.particleFilterAlgo(XPrev, uCurrent, uPrev, zCurrent)
 
 
@@ -49,11 +53,11 @@ class particleFilter(object):
         XCurrentBar = XPrev
         wtCurrent = np.ones(self.N)
         for n in range(self.N):
-            if not np.array_equal(uCurrent[0:3], uPrev[0:3]):
+            #if not np.array_equal(uCurrent[0:3], uPrev[0:3]):
                 #while (gridFunctions.checkLimits(XCurrentBar[n], self.resolution, self.occGrid.shape)):
                     #occ = gridFunctions.occupancy(XCurrentBar[n], self.resolution, self.occGrid)
                     #if (occ>0.8):
-                XCurrentBar[n] = motionModel.motionModel(uCurrent, uPrev, XPrev[n], self.alpha)
+            XCurrentBar[n] = motionModel.motionModel(uCurrent, uPrev, XPrev[n], self.alpha)#,self.m,self.resolution)
                     #if not (gridFunctions.checkLimits(XCurrentBar[n], self.resolution, self.occGrid.shape)):
                         #break
 
@@ -61,29 +65,34 @@ class particleFilter(object):
             #wtCurrent[n] = measurementModel.likelihoodRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid, self.downSample, self.resolution, self.offset, self.minDist)
             wtCurrent[n] = measurementModel.beamRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid,self.downSample, self.resolution, self.offset)
             #XCurrentBar[n] = np.concatenate((xCurrent, wtCurrent), axis = 1)
-            #print "wt: ", wtCurrent[n]
+            print ("wt: ", wtCurrent)
         XCurrent = resample.resampleParticles(XCurrentBar, wtCurrent)
         #IPython.embed()
-        #print XCurrent
+        #print(XCurrent)
         return XCurrent
 
-    def visualize(self, X, res):
+    def visualize(self, X, res, i,basePath):
         self.scat.remove()
         y = np.floor(X[:,0]/res)
         x = np.floor(X[:,1]/res)
         u = np.cos(X[:,2])
         v = np.sin(X[:,2])
-        self.scat = plt.quiver(x,y,u,v, edgecolor = 'k', facecolor = 'r')
+        plt.imshow(self.m, cmap='gray')
+        plt.ion()
+        self.scat = plt.quiver(x, y, u, v, color='red', width=0.005)
+        plt.savefig(os.path.join(basePath, "..", "images", 'fig {0}.jpg'.format(i)))
         plt.pause(0.00001)
         #plt.show()
+
+
 
 def main():
     odomData, laserData = logParser.parser()
     #minDist = np.loadtxt('min_d.dat', delimiter=' ')
     m, mapData, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
-    numParticles = 1000
+    numParticles = 100
     particleSize = 3
-    downSample = 10
+    downSample = 20
     offset = 25
     XInitial = np.zeros([numParticles,particleSize])
 
@@ -98,9 +107,9 @@ def main():
             occ = gridFunctions.occupancy(XInitial[i], resolution, mapData)
             if occ > 0.8:
                 break
-    alpha = np.array([0.00001, 0.00001, 0.01, 0.01])
+    alpha = np.array([0.05, 0.05, 0.1, 0.1])
     #pf = particleFilter(m, laserData, odomData, mapData, resolution, numParticles, XInitial, alpha, downSample, offset, minDist)
     pf = particleFilter(m, laserData, odomData, mapData, resolution, numParticles, XInitial, alpha, downSample, offset)
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()

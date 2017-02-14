@@ -39,7 +39,7 @@ def resampleParticles(X, weights):
 
 #if __name__ == "__main__":
 #	main()
-#=======
+
 '''def main():
     X = np.array([[7,5,4],[1,2,5],[4,5,9],[5,6,3.4],[0.3,4,6]])
     w = np.array([1,20,30,40,100])
@@ -47,4 +47,4 @@ def resampleParticles(X, weights):
 
 if __name__ == "__main__":
     main()'''
-#>>>>>>> master
+
