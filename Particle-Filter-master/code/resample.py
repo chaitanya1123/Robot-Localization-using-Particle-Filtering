@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#------------------------------------------------------
+#----------Implemented a low-variance resampler--------
+#------------------------------------------------------
 import IPython
 import pdb
 import random
@@ -13,7 +15,7 @@ def resampleParticles(X, weights):
     k = 0
     sumWeights=0
     for i in range(N):
-        sumWeights += weights[i]
+        sumWeights += weights[i] #Normalization Step
 
     normWeights = weights*1.0/sumWeights
     r = random.uniform(0, 1.0/N)

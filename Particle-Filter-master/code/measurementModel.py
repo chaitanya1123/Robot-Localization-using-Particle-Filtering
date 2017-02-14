@@ -1,3 +1,7 @@
+#------------------------------------------------------------------------------------
+#----Implemented the measurement model using the beam range sensor model-------------
+#------------------------------------------------------------------------------------
+
 import numpy as np
 import sys
 import time
@@ -13,9 +17,9 @@ import logParser
 #
 # parameters :
 #zHit, zRand, zShort, zMax, sigmaHit, lambdaShort
-#zMax = 5000
 #L = 25
 
+#Parameters for the measurement model
 zRand = 0.19
 zHit = 0.67
 zShort = 0.13
@@ -24,8 +28,8 @@ sigmaHit = 2
 lambdaShort = 0.03
 laserMax = 1000
 
-def measurementToMap(zt, xt, n, L):
-    #IPython.embed()
+def measurementToMap(zt, xt, n, L): #Original Distance to Map
+
     zt_map = np.empty([n])
     #print zt_map.shape
     #for k in range(0, zt.shape[0], zt.shape[0]/n):
@@ -34,10 +38,11 @@ def measurementToMap(zt, xt, n, L):
         phi = -90 + k      #ztk[2]
         xt_k = xt[0] + L*math.cos(theta) + zt[k]*math.cos(theta + phi)
         yt_k = xt[1] + L*math.sin(theta) + zt[k]*math.sin(theta + phi)
-        #IPython.embed()
+
         zt_map[k*n/len(zt)] = math.sqrt(xt_k**2 + yt_k**2)
     return zt_map
 
+#---Defining pHit, pShort, pRand, pMax----
 def get_pHit(ztk, zt_true):
     if ztk >= 0 and ztk <= laserMax:
         #pHit = np.random.normal(zt_true, sigmaHit)
@@ -74,7 +79,7 @@ def get_pRand(ztk):
     else:
         return 0
 
-def beamRangeFinderModel(zt, xt, m, n, resolution, L):
+def beamRangeFinderModel(zt, xt, m, n, resolution, L): #Implement beam range sensor model
     q = 1
     #zMax = 2000
     zt_map = measurementToMap(zt, xt, n, L)
@@ -92,12 +97,12 @@ def beamRangeFinderModel(zt, xt, m, n, resolution, L):
         #print "p: ", p
         q = q * p
         if q == 0:
-            q = 1e-5
+            q = 1e-20 #If q is zero then reassign q a small probability
 
     return q
 
 
-def rayCasting(xt, m, laserMax, n, resolution):
+def rayCasting(xt, m, laserMax, n, resolution): #Ray Casting Step
     #pixeltocm = 10
     xc = xt[0] #x-starting position of the beam
     yc = xt[1] #y-starting position of the beam
@@ -108,11 +113,7 @@ def rayCasting(xt, m, laserMax, n, resolution):
         #print lrange
         return lrange,angs
 
-    #plt.imshow(m, cmap = 'gray', extent = [0,800,800,0])
-    #plt.plot(1.0*xc/10,1.0*yc/10,'bo')
-
-
-    thetastep = np.pi/n
+    thetastep = np.pi/n #Downsample 180 rays by n(DownSample = 10)
     for i in range(n):
         theta = -(np.pi/2) + thetastep * i
         r = np.linspace(0, laserMax, 1000)
@@ -120,15 +121,12 @@ def rayCasting(xt, m, laserMax, n, resolution):
         y = yc + (r[:]*math.sin(theta))
         t = 0
         temp = []
-        for k in range(len(x)):
+        for k in range(len(x)): #If x,y are out of bounds
             if not gridFunctions.checkLimits(np.array([x[k],y[k],t]), resolution, m.shape):
                 temp.append(k)
         if (temp):
             x = np.delete(x, temp)
             y = np.delete(y, temp)
-
-        # plot (x,y)
-        #plt.plot(x,y,'go')
 
         xint = (x/resolution).astype(int)
         yint = (y/resolution).astype(int)
@@ -137,28 +135,23 @@ def rayCasting(xt, m, laserMax, n, resolution):
         for j in range(len(xint)):
             b.append(m[yint[j]][xint[j]])
         ind = np.where(np.array(b) == 0)
-        #if i is 69:
-            #IPython.embed()
-        #print b
-        #print ind
 
         if ind[0].size:
             xb = x[ind[0][0]]
             yb = y[ind[0][0]]
-            #plt.plot(1.0*xb/10,1.0*yb/10,'yo')
-            dist = math.sqrt((xc-xb)**2 + (yc-yb)**2)
-            phi = math.atan2((yc-yb), (xc-xb))
+            dist = math.sqrt((xc-xb)**2 + (yc-yb)**2) #distance
+            phi = math.atan2((yc-yb), (xc-xb)) #phase
             angs[i] = phi
             lrange[i] = dist
 
     #plt.show()
     #print lrange
-    #IPython.embed()
+
     return lrange, angs
 
 
 
-def likelihoodRangeFinderModel(zt, xt, m, n, resolution, L, minDist):
+def likelihoodRangeFinderModel(zt, xt, m, n, resolution, L, minDist): #Alternative to beam range findeer model
     q = 1
     for k in range(0, zt.shape[0], zt.shape[0]/n):
         theta = xt[2]
@@ -169,7 +162,7 @@ def likelihoodRangeFinderModel(zt, xt, m, n, resolution, L, minDist):
         if (zt_map<laserMax):
             xint = (xt_k/resolution).astype(int)
             yint = (yt_k/resolution).astype(int) 
-            #IPython.embed()           
+
             dist = minDist[xint,yint]
             q = q * (zHit*(dist)/(dist+sigmaHit**2) + (zRand/zMax))
     return q 
@@ -183,7 +176,7 @@ def main():
     #measurementToMap(LData[0,6:-1], xt, n, L)
     
     #q = beamRangeFinderModel(LData[0,6:-1], xt, m, n)
-    #IPython.embed()
+
     #print q
 
     

@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#------------------------------------------------------------------------------------
+#----Functions for checking the prob of occupancy and Limits in the map--------------
+#------------------------------------------------------------------------------------
 import numpy as np 
 import math
 import IPython
@@ -6,7 +8,7 @@ import IPython
 def occupancy(x, resolution, map):
     xMap = int(math.floor(x[0]//resolution))
     yMap = int(math.floor(x[1]//resolution))
-    #IPython.embed()
+
     return 1-map[xMap, yMap]
 
 def checkLimits(x, resolution, mapSize):

@@ -1,15 +1,17 @@
-#!/usr/bin/env python
+#------------------------------------------------------------------------------------
+#--------------------Implemented the sample odometry motion model--------------------
+#------------------------------------------------------------------------------------
+
 import random
 import math
 import numpy as np
 import gridFunctions
 import IPython
 
-
 def motionModel(uCurrent, uPrev, xPrev, alpha):
-    xCurrent = np.zeros(xPrev.shape)
-    # IPython.embed()
+    xCurrent = np.zeros(xPrev.shape) #Initialize
 
+    #Calc deltas, deltacaps, and x,y,theta
     deltaRot1 = math.atan2(uCurrent[1] - uPrev[1], uCurrent[0] - uPrev[0]) - uPrev[2]
     deltaTrans = math.sqrt((uCurrent[0] - uPrev[0]) ** 2 + (uCurrent[1] - uPrev[1]) ** 2)
     deltaRot2 = uCurrent[2] - uPrev[2] - deltaRot1
@@ -31,7 +33,6 @@ def motionModel(uCurrent, uPrev, xPrev, alpha):
     xCurrent[1] = xPrev[1] + trueTrans * math.sin(xPrev[2] + trueRot1)
     xCurrent[2] = xPrev[2] + trueRot1 + trueRot2
     # xCurrent[2] = (xCurrent[2] + (- 2*np.pi)*(xCurrent[2] > np.pi) + (2*np.pi)*(xCurrent[2] < -np.pi))
-    # IPython.embed()
     return xCurrent
 
 
