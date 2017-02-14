@@ -69,7 +69,7 @@ class particleFilter(object):
                 np.savetxt("w-after-meam.txt", wtCurrent, delimiter=" ")
             #XCurrentBar[n] = np.concatenate((XCurrent, wtCurrent), axis = 1)
                 #print ("wt: ", wtCurrent)
-        if not np.array_equal(XCurrentBar, XPrev):
+        #if not np.array_equal(XCurrentBar, XPrev):
             XCurrent = resample.resampleParticles(XCurrentBar, wtCurrent)
             np.savetxt("x-after-resample.txt", XCurrent, delimiter=" ")
             return XCurrent
@@ -96,7 +96,7 @@ def main():
     odomData, laserData = logParser.parser()
     #minDist = np.loadtxt('min_d.dat', delimiter=' ')
     m, mapData, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
-    numParticles = 1000
+    numParticles = 100
     particleSize = 3
     downSample = 10
     offset = 25

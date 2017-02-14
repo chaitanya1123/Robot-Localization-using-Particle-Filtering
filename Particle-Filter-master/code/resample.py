@@ -3,7 +3,6 @@ import IPython
 import pdb
 import random
 import numpy as np
-#<<<<<<< HEAD
 import random
 #from mapParser import parser
 
@@ -17,7 +16,7 @@ def resampleParticles(X, weights):
         sumWeights += weights[i]
 
     normWeights = weights*1.0/sumWeights
-    r = random.uniform(0,1.0/N)
+    r = random.uniform(0, 1.0/N)
 
     c = normWeights[0]
     i = 0
@@ -25,7 +24,7 @@ def resampleParticles(X, weights):
         u = r + m*(1.0/N)
         while u > c:
             i = i + 1
-            c = c + (1.0*normWeights[i])
+            c = c + normWeights[i]
         XNew[k] = X[i]
         k=k+1
     return XNew

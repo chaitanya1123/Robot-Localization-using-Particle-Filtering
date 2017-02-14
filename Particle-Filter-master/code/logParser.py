@@ -5,7 +5,7 @@ def parser():
     OData = {}
     LData = {}
     basePath = os.path.dirname(__file__)
-    filePath = os.path.abspath(os.path.join(basePath,"..","data","log","robotdata1.log"))
+    filePath = os.path.abspath(os.path.join(basePath,"..","data","log","ascii-robotdata2.log"))
     f = open(filePath,"r")
     #with open('robotdata1.log') as f:
     lines = f.read().splitlines()
