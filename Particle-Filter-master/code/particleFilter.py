@@ -35,7 +35,7 @@ class particleFilter(object):
         #back = self.LData.shape[0]-1
         back = len(self.LData)-1
         for i in range(back):
-            #print "time " + str(i)
+            print("time " + str(i))
             XPrev = XCurrent
             #IPython.embed()
             uPrev = self.OData[i]
@@ -45,31 +45,33 @@ class particleFilter(object):
             zCurrent = self.LData[i + 1][6:-1]
             basePath = os.path.dirname(__file__)
             self.visualize(XCurrent, self.resolution, i, basePath)
-            XCurrent = self.particleFilterAlgo(XPrev, uCurrent, uPrev, zCurrent)
+            XCurrent = self.particleFilterAlgo(XPrev, uCurrent, uPrev, zCurrent, i)
 
 
-    def particleFilterAlgo(self, XPrev, uCurrent, uPrev, zCurrent):
+    def particleFilterAlgo(self, XPrev, uCurrent, uPrev, zCurrent, i):
         XCurrent = np.zeros(XPrev.shape)
         XCurrentBar = XPrev
         wtCurrent = np.ones(self.N)
-        for n in range(self.N):
-            #if not np.array_equal(uCurrent[0:3], uPrev[0:3]):
+        print(uCurrent[0:3])
+        if (uCurrent[0:3] != uPrev[0:3]):
+            for n in range(self.N):
                 #while (gridFunctions.checkLimits(XCurrentBar[n], self.resolution, self.occGrid.shape)):
                     #occ = gridFunctions.occupancy(XCurrentBar[n], self.resolution, self.occGrid)
                     #if (occ>0.8):
-            XCurrentBar[n] = motionModel.motionModel(uCurrent, uPrev, XPrev[n], self.alpha)#,self.m,self.resolution)
+                XCurrentBar[n] = motionModel.motionModel(uCurrent, uPrev, XPrev[n], self.alpha)#,self.m,self.resolution)
                     #if not (gridFunctions.checkLimits(XCurrentBar[n], self.resolution, self.occGrid.shape)):
                         #break
-
-                #print XCurrentBar[n]
+            #print XCurrentBar[n]
             #wtCurrent[n] = measurementModel.likelihoodRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid, self.downSample, self.resolution, self.offset, self.minDist)
-            wtCurrent[n] = measurementModel.beamRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid,self.downSample, self.resolution, self.offset)
-            #XCurrentBar[n] = np.concatenate((xCurrent, wtCurrent), axis = 1)
-            print ("wt: ", wtCurrent)
-        XCurrent = resample.resampleParticles(XCurrentBar, wtCurrent)
+                wtCurrent[n] = measurementModel.beamRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid,self.downSample, self.resolution, self.offset)
+            #XCurrentBar[n] = np.concatenate((XCurrent, wtCurrent), axis = 1)
+                #print ("wt: ", wtCurrent)
+        if not np.array_equal(XCurrentBar, XPrev):
+            XCurrent = resample.resampleParticles(XCurrentBar, wtCurrent)
+            return XCurrent
         #IPython.embed()
         #print(XCurrent)
-        return XCurrent
+        return XCurrentBar
 
     def visualize(self, X, res, i,basePath):
         self.scat.remove()

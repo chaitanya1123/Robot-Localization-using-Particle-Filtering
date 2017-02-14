@@ -91,6 +91,8 @@ def beamRangeFinderModel(zt, xt, m, n, resolution, L):
         p = zHit * get_pHit(zt_map[k], zt_true[k]) + get_pShort(zt_map[k], zt_true[k]) + get_pMax(zt_map[k]) + get_pRand(zt_map[k])
         #print "p: ", p
         q = q * p
+        if q == 0:
+            q = 1e-40
 
     return q
 
@@ -176,8 +178,8 @@ def likelihoodRangeFinderModel(zt, xt, m, n, resolution, L, minDist):
 def main():
     m, z, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
     OData, LData = logParser.parser()
-    xt = np.array([4000,4000,np.pi])
-    n= 100
+    #xt = np.array([4000,4000,np.pi])
+    #n= 100
     #measurementToMap(LData[0,6:-1], xt, n, L)
     
     #q = beamRangeFinderModel(LData[0,6:-1], xt, m, n)
@@ -185,7 +187,7 @@ def main():
     #print q
 
     
-    rayCasting(xt, z, laserMax, n, 10)
+    #rayCasting(xt, z, laserMax, n, 10)
 
 #main()
 
