@@ -59,15 +59,19 @@ class particleFilter(object):
                     #occ = gridFunctions.occupancy(XCurrentBar[n], self.resolution, self.occGrid)
                     #if (occ>0.8):
                 XCurrentBar[n] = motionModel.motionModel(uCurrent, uPrev, XPrev[n], self.alpha)#,self.m,self.resolution)
+                np.savetxt("x-after-mom.txt", XCurrentBar, delimiter=" ")
+
                     #if not (gridFunctions.checkLimits(XCurrentBar[n], self.resolution, self.occGrid.shape)):
                         #break
-            #print XCurrentBar[n]
+                #print(XCurrentBar[n])
             #wtCurrent[n] = measurementModel.likelihoodRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid, self.downSample, self.resolution, self.offset, self.minDist)
                 wtCurrent[n] = measurementModel.beamRangeFinderModel(zCurrent, XCurrentBar[n], self.occGrid,self.downSample, self.resolution, self.offset)
+                np.savetxt("w-after-meam.txt", wtCurrent, delimiter=" ")
             #XCurrentBar[n] = np.concatenate((XCurrent, wtCurrent), axis = 1)
                 #print ("wt: ", wtCurrent)
         if not np.array_equal(XCurrentBar, XPrev):
             XCurrent = resample.resampleParticles(XCurrentBar, wtCurrent)
+            np.savetxt("x-after-resample.txt", XCurrent, delimiter=" ")
             return XCurrent
         #IPython.embed()
         #print(XCurrent)
@@ -92,9 +96,9 @@ def main():
     odomData, laserData = logParser.parser()
     #minDist = np.loadtxt('min_d.dat', delimiter=' ')
     m, mapData, global_mapsize_x, global_mapsize_y, resolution, autoshifted_x, autoshifted_y = mapParser.parser()
-    numParticles = 100
+    numParticles = 1000
     particleSize = 3
-    downSample = 20
+    downSample = 10
     offset = 25
     XInitial = np.zeros([numParticles,particleSize])
 

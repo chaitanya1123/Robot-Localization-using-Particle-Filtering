@@ -35,7 +35,7 @@ def measurementToMap(zt, xt, n, L):
         xt_k = xt[0] + L*math.cos(theta) + zt[k]*math.cos(theta + phi)
         yt_k = xt[1] + L*math.sin(theta) + zt[k]*math.sin(theta + phi)
         #IPython.embed()
-        #zt_map[k*n/zt.shape[0]] = math.sqrt(xt_k**2 + yt_k**2)
+        zt_map[k*n/len(zt)] = math.sqrt(xt_k**2 + yt_k**2)
     return zt_map
 
 def get_pHit(ztk, zt_true):
@@ -92,7 +92,7 @@ def beamRangeFinderModel(zt, xt, m, n, resolution, L):
         #print "p: ", p
         q = q * p
         if q == 0:
-            q = 1e-40
+            q = 1e-5
 
     return q
 
